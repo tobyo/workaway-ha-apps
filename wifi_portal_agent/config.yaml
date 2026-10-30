@@ -1,0 +1,36 @@
+name: WiFi Portal Agent
+version: "0.1.1"
+slug: wifi_portal_agent
+description: Local agent for the guest WiFi captive portal (UniFi external portal server)
+arch:
+  - aarch64
+  - amd64
+  - armv7
+startup: application
+boot: auto
+homeassistant_api: true
+# Host networking so the agent listens on the host's port 80 and sees guests' real IPs
+# (needed for verify_client_ip). Port 80 must be free on the Home Assistant host.
+host_network: true
+options:
+  property: ""
+  property_key: ""
+  worker_url: "https://wifi.example.com"
+  unifi_url: "https://192.168.1.1"
+  unifi_site: default
+  unifi_username: ""
+  unifi_password: ""
+  verify_unifi_tls: false
+  verify_client_ip: true
+  ha_event: wifi_portal_guest_authorized
+schema:
+  property: str
+  property_key: password
+  worker_url: url
+  unifi_url: url
+  unifi_site: str
+  unifi_username: str
+  unifi_password: password
+  verify_unifi_tls: bool
+  verify_client_ip: bool
+  ha_event: str?

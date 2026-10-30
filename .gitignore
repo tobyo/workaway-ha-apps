@@ -1,0 +1,6 @@
+.DS_Store
+.env
+*.env
+options.json
+agent-options.json
+ob-wifi-keys*
