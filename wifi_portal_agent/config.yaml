@@ -1,5 +1,5 @@
 name: WiFi Portal Agent
-version: "0.1.1"
+version: "0.2.0"
 slug: wifi_portal_agent
 description: Local agent for the guest WiFi captive portal (UniFi external portal server)
 arch:
@@ -18,8 +18,7 @@ options:
   worker_url: "https://wifi.example.com"
   unifi_url: "https://192.168.1.1"
   unifi_site: default
-  unifi_username: ""
-  unifi_password: ""
+  unifi_api_key: ""
   verify_unifi_tls: false
   verify_client_ip: true
   ha_event: wifi_portal_guest_authorized
@@ -29,8 +28,7 @@ schema:
   worker_url: url
   unifi_url: url
   unifi_site: str
-  unifi_username: str
-  unifi_password: password
+  unifi_api_key: password
   verify_unifi_tls: bool
   verify_client_ip: bool
   ha_event: str?

@@ -13,7 +13,7 @@ const CONTEXT_MAX_AGE_S = 6 * 60 * 60;
 const MAX_BODY_BYTES = 64 * 1024;
 const MAC_RE = /^[0-9a-f]{2}(:[0-9a-f]{2}){5}$/;
 
-for (const key of ["property", "property_key", "worker_url", "unifi_url", "unifi_username", "unifi_password"]) {
+for (const key of ["property", "property_key", "worker_url", "unifi_url", "unifi_api_key"]) {
   if (!config[key]) fail(`Missing required option: ${key}`);
 }
 if (config.property_key.length < 32) fail("property_key must be at least 32 characters (use `openssl rand -hex 32`)");
@@ -22,8 +22,7 @@ const workerOrigin = new URL(config.worker_url).origin;
 const unifi = new UniFi({
   url: config.unifi_url,
   site: config.unifi_site || "default",
-  username: config.unifi_username,
-  password: config.unifi_password,
+  apiKey: config.unifi_api_key,
   verifyTls: Boolean(config.verify_unifi_tls),
 });
 
@@ -92,8 +91,8 @@ async function handleLanding(req, res, url) {
     // Stops someone on the guest network authorising a different device by editing ?id=.
     try {
       const client = await unifi.getClient(mac);
-      if (client?.ip && client.ip !== clientIp(req)) {
-        log(`rejected landing: ${mac} is at ${client.ip}, request came from ${clientIp(req)}`);
+      if (client?.ipAddress && client.ipAddress !== clientIp(req)) {
+        log(`rejected landing: ${mac} is at ${client.ipAddress}, request came from ${clientIp(req)}`);
         return page(res, 403, "Something went wrong", "Please open the sign-in page from the device you want to connect.");
       }
     } catch (err) {
@@ -124,7 +123,7 @@ async function authorize(token, ctx) {
     a && a.v === 1 && a.property === config.property && a.mac === ctx.mac && a.exp >= now() && Number.isInteger(a.minutes) && a.minutes > 0;
   if (!valid) throw new Error("Invalid authorisation from portal");
 
-  await unifi.authorizeGuest({ mac: a.mac, minutes: a.minutes, down: a.down, up: a.up, ap: ctx.ap });
+  await unifi.authorizeGuest({ mac: a.mac, minutes: a.minutes, down: a.down, up: a.up });
   log(`authorised ${a.mac} for ${a.minutes} min`);
 
   if (config.ha_event && process.env.SUPERVISOR_TOKEN) {
